@@ -1,3 +1,5 @@
+# These packages need to be loaded.
+
 library(readxl) # To read the spreadsheet with synthetic data
 library(lubridate)
 library(dplyr)
@@ -5,9 +7,13 @@ library(ggplot2)
 
 # Read the data -----------------------------------------------------------
 
+# Make sure that the working directory is where the script is located as the
+# path to the data are all taken to be relative to this path. In the files
+# panel in RStudio navigate to where the R code file is located and then
+# do More -> Set as working directory.
 
 # Read the synthetic data into a tibble
-data <- read_xlsx("~/Synthetic_data.xlsx")
+data <- read_xlsx("../data/Synthetic_data.xlsx")
 
 # Create multiple new columns for months
 data[c("Jan","Feb","Mar","Apr","Jun","Jul",
