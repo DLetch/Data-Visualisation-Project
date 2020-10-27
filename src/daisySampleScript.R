@@ -113,16 +113,36 @@ d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
 
 # Partner effort ----------------------------------------------------------
 
-data %>% select(Partner="Partner/contributor",Effort,Start,End) %>% 
-   ggplot(aes(x=floor_date(Start,unit="month"),y=Effort,fill=Partner)) + 
-   geom_col(position="stack", colour="black") + xlab("2020") +
-   ylab("Effort (FTE)")
+# Without black lines
+d %>% select(Partner="Partner/contributor",Month,MonthEffort) %>% 
+      ggplot(aes(x=factor(Month,levels=Months),y=MonthEffort,fill=Partner)) + 
+      geom_col(aes(group=Partner),position="stack") + xlab("2020") +
+      ylab("Effort (FTE)")
 
+# With black lines
+d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
+   group_by(Month,Partner)                                            %>% 
+   summarise(Effort=sum(MonthEffort))                                 %>% 
+   ggplot(aes(x=factor(Month,levels=Months),y=Effort,fill=Partner)) + 
+   geom_col(aes(group=Partner),position="stack",colour="black") + xlab("2020") +
+   ylab("Effort (FTE)")
 
 # Project Area ------------------------------------------------------------
 
 # This is not working
-data %>% select(Partner="Partner/contributor",Effort,Start,End,Project) %>% 
-  ggplot(aes(x=floor_date(Start,unit="month"),y=Effort,fill=Partner)) + 
-  geom_area(position="stack", colour="black") + facet_wrap(~vars(Project)) +xlab("2020") +
-  ylab("Effort (FTE)")
+d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
+      ggplot(aes(x=factor(Month,levels=Months),y=MonthEffort,fill=Partner),colour="black") + 
+      geom_area(stat="identity",position="stack") + xlab("2020") +
+      ylab("Effort (FTE)")
+
+d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
+   group_by(Month, Project, Partner) %>% 
+   summarise(Effort=sum(MonthEffort),.groups="keep") %>% 
+   ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Project,fill=Project)) +
+   geom_line(aes(colour=Project)) 
+
+d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
+      group_by(Month, Project, Partner) %>% 
+      summarise(Effort=sum(MonthEffort),.groups="keep") %>% 
+      ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Project,fill=Project)) +
+      geom_line(position="stack",aes(colour=Project)) + geom_area()
