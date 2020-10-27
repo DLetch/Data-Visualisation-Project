@@ -33,13 +33,21 @@ if(! "Jan" %in% colnames(data)){
 # Get today's date
 Today = today()
 
-# Loop over the rows to get the days used - it does not take into account years.
-# For years another inner loop would have to be added.
+# Effort per day.
+data$EffortPerDay <- ifelse(data$End <= rep(Today,nrow(data)), 
+                            round(data$Effort/as.numeric(data$End-data$Start),3),
+                            round(data$Effort/as.numeric(Today-data$Start),3))
+
+# Loop over the rows to get the days used to calculate the effort - it does not 
+# take into account years. For years another inner loop would have to be added.
 for(i in 1:nrow(data)){
    
    # Dates of start and end of project
    Start <- data[i,"Start"]
    End <- data[i,"End"]
+   
+   # Get the effort per day
+   EffortPerDay <- data[i,"EffortPerDay"]
    
    # Check if the project has started
    if(today < Start){
@@ -64,9 +72,9 @@ for(i in 1:nrow(data)){
       if(mStart == m & mEnd == m){
          
          if(Today < End){
-            data[i,Months[m]] <- day(Today) - day(Start)
+            data[i,Months[m]] <- (day(Today) - day(Start))*EffortPerDay
          }else{
-            data[i,Months[m]] <- day(End) - day(Start)
+            data[i,Months[m]] <- (day(End) - day(Start))*EffortPerDay
          }
          
          # Do the next month
@@ -74,7 +82,7 @@ for(i in 1:nrow(data)){
          
       }else if(mStart == m & m < mToday) {
          
-         data[i,Months[m]] <- days_in_month(m) - day(Start)
+         data[i,Months[m]] <- (days_in_month(m) - day(Start))*EffortPerDay
          
          # move to the the next month
          next
@@ -84,25 +92,19 @@ for(i in 1:nrow(data)){
       # Today is past the current month but less than the end date. 
       # Give it all the days in the month
       if(m < mToday & m < mEnd){
-         data[i,Months[m]] <- days_in_month(m)
+         data[i,Months[m]] <- days_in_month(m)*EffortPerDay
       }
       
       if(mEnd == m & Today < End){
-         data[i,Months[m]] <- day(Today)
+         data[i,Months[m]] <- day(Today)*EffortPerDay
       }else if(mEnd == m){
-         data[i,Months[m]] <- day(End)
+         data[i,Months[m]] <- day(End)*EffortPerDay
       }
       
    } # End loops over months
    
 }# End loop over rows
 
-
-
-# https://ro-che.info/articles/2017-02-22-group_by_month_r
-
-# Effort per month - more complicated than this - need to take today into account.
-data$EffortPerDay <- data$Effort/as.numeric(data$End-data$Start)
 
 # Partner effort ----------------------------------------------------------
 
