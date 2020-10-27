@@ -1,9 +1,11 @@
 # These packages need to be loaded.
 
-library(readxl) # To read the spreadsheet with synthetic data
-library(lubridate)
-library(dplyr)
-library(ggplot2)
+library(readxl)     # To read the spreadsheet with synthetic data
+library(lubridate)  # To deal with date data
+library(tidyr)      # To reformat the data
+library(dplyr)      # To manipulate the data
+library(ggplot2)    # To plot the data
+
 
 # Read the data -----------------------------------------------------------
 
@@ -105,6 +107,9 @@ for(i in 1:nrow(data)){
    
 }# End loop over rows
 
+# Convert the month columns to become row values in a Month column and the 
+# corresponding effort values in a MonthEffort column.
+d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
 
 # Partner effort ----------------------------------------------------------
 
