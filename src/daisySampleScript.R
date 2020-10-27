@@ -22,13 +22,13 @@ data <- read_xlsx("../data/Synthetic_data.xlsx")
 data$Start <- ymd(data$`Start date`)
 data$End <- ymd(data$`End date`)
 
-# Create multiple new columns for months - stackoverflow 25357194. Initialise to zero
-Months <- c("Jan","Feb","Mar","Apr","Jun","Jul", "Aug","Sep","Oct","Nov","Dec")
-data <-cbind(data,setNames(lapply(Months, function(x) x=0),Months))
+Months <- c("Jan","Feb","Mar","Apr","May","Jun","Jul", "Aug","Sep","Oct","Nov","Dec")
 
-data[1,Months[1]]  <- 5
-
-# days_in_month()
+# Create multiple new columns for months - stackoverflow 25357194 and initialise
+# to zero if the columns have not already been created. 
+if(! "Jan" %in% colnames(data)){ 
+   data <-cbind(data,setNames(lapply(Months, function(x) x=0),Months))
+}
 
 # Get today's date
 Today = today()
@@ -58,11 +58,44 @@ for(i in 1:nrow(data)){
    for(m in 1:12){
       
       # if outside the start or end move to the next month
-      if(mStart < m|mEnd < m) next
+      if(m < mStart | mEnd < m) next
+      
+      # We are at the start of the project
+      if(mStart == m & mEnd == m){
+         
+         if(Today < End){
+            data[i,Months[m]] <- day(Today) - day(Start)
+         }else{
+            data[i,Months[m]] <- day(End) - day(Start)
+         }
+         
+         # Do the next month
+         next
+         
+      }else if(mStart == m & m < mToday) {
+         
+         data[i,Months[m]] <- days_in_month(m) - day(Start)
+         
+         # move to the the next month
+         next
+         
+      }
+      
+      # Today is past the current month but less than the end date. 
+      # Give it all the days in the month
+      if(m < mToday & m < mEnd){
+         data[i,Months[m]] <- days_in_month(m)
+      }
+      
+      if(mEnd == m & Today < End){
+         data[i,Months[m]] <- day(Today)
+      }else if(mEnd == m){
+         data[i,Months[m]] <- day(End)
+      }
       
    } # End loops over months
    
-}# End loop over years
+}# End loop over rows
 
 
 
