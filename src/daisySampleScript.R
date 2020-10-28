@@ -152,7 +152,7 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
    summarise(Effort=sum(MonthEffort),.groups="keep")                  %>% 
    ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Partner,fill=Partner)) +
    geom_area(aes(colour=Partner)) + geom_line(position="stack",colour="black") +
-   xlab("2020") + ggtitle("Effort by Partner/Collaborator")
+   xlab("2020") + ggtitle("Effort by Partner/Contributor")
 
 # Normalised monthly effort by Partner
 d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
@@ -161,5 +161,9 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
    ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Partner,fill=Partner)) +
    geom_area(aes(colour=Partner),position="fill") + geom_line(position="fill",colour="black") +
    xlab("2020") + ggtitle("Normalised effort by Partner/collaborator") + 
-   ylab("% Effort for Partner/Collaborator") + scale_y_continuous(labels = scales::percent) 
+   ylab("% Effort for Partner/Contributor") + scale_y_continuous(labels = scales::percent) 
+
+
+# Alluvial charts ---------------------------------------------------------
+
 
