@@ -1,11 +1,11 @@
-# These packages need to be loaded.
+# These packages need to be loaded (or installed if not present).
 
-library(readxl)     # To read the spreadsheet with synthetic data
-library(lubridate)  # To deal with date data
-library(tidyr)      # To reformat the data
-library(dplyr)      # To manipulate the data
-library(ggplot2)    # To plot the data
-
+library(readxl)      # To read the spreadsheet with synthetic data
+library(lubridate)   # To deal with date data
+library(tidyr)       # To reformat the data
+library(dplyr)       # To manipulate the data
+library(ggplot2)     # To plot the data
+library(ggalluvial)  # For alluvial plots
 
 # Read the data -----------------------------------------------------------
 
@@ -108,18 +108,19 @@ for(i in 1:nrow(data)){
 }# End loop over rows
 
 # Convert the month columns to become row values in a Month column and the 
-# corresponding effort values in a MonthEffort column.
+# corresponding effort values in a MonthEffort column. This facilitates
+# the plotting when using ggplot.
 d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
 
 # Partner effort ----------------------------------------------------------
 
-# Without black lines
+# Without black lines dlineating the project partners.
 d %>% select(Partner="Partner/contributor",Month,MonthEffort) %>% 
       ggplot(aes(x=factor(Month,levels=Months),y=MonthEffort,fill=Partner)) + 
       geom_col(aes(group=Partner),position="stack") + xlab("2020") +
       ylab("Effort (FTE)")
 
-# With black lines
+# With black lines delineating the project partner segments.
 d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
    group_by(Month,Partner)                                            %>% 
    summarise(Effort=sum(MonthEffort))                                 %>% 
@@ -137,7 +138,7 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
       geom_area(aes(colour=Project)) + geom_line(position="stack",colour="black") +
       xlab("2020") + ggtitle("Effort by Project")
 
-# Normalised monthly effort by Project - warning from zero values I think
+# Normalised monthly effort by Project - warning from zero values in plots I think
 d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
    group_by(Month, Project)                                        %>% 
    summarise(Effort=sum(MonthEffort),.groups="keep")               %>% 
@@ -154,7 +155,7 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
    geom_area(aes(colour=Partner)) + geom_line(position="stack",colour="black") +
    xlab("2020") + ggtitle("Effort by Partner/Contributor")
 
-# Normalised monthly effort by Partner
+# Normalised monthly effort by Partner (warnings for the same reason)
 d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
    group_by(Month, Partner,.drop=FALSE)                               %>% 
    summarise(Effort=sum(MonthEffort),.groups="keep")                  %>% 
