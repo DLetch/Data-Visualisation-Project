@@ -137,6 +137,15 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
       geom_area(aes(colour=Project)) + geom_line(position="stack",colour="black") +
       xlab("2020") + ggtitle("Effort by Project")
 
+# Normalised monthly effort by Project - warning from zero values I think
+d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
+   group_by(Month, Project)                                        %>% 
+   summarise(Effort=sum(MonthEffort),.groups="keep")               %>% 
+   ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Project,fill=Project)) +
+   geom_area(aes(colour=Project),position="fill") + geom_line(position="fill",colour="black") +
+   xlab("2020") + ggtitle("Normlised effort by Project") + 
+   ylab("% Effort for project") + scale_y_continuous(labels = scales::percent) 
+
 # Monthly effort by Partner
 d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
    group_by(Month, Partner,.drop=FALSE)                               %>% 
@@ -144,3 +153,13 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
    ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Partner,fill=Partner)) +
    geom_area(aes(colour=Partner)) + geom_line(position="stack",colour="black") +
    xlab("2020") + ggtitle("Effort by Partner/collaborator")
+
+# Normalised monthly effort by Partner
+d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
+   group_by(Month, Partner,.drop=FALSE)                               %>% 
+   summarise(Effort=sum(MonthEffort),.groups="keep")                  %>% 
+   ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Partner,fill=Partner)) +
+   geom_area(aes(colour=Partner),position="fill") + geom_line(position="fill",colour="black") +
+   xlab("2020") + ggtitle("Normalised effort by Partner/collaborator") + 
+   ylab("% Effort for Partner/Collaborator") + scale_y_continuous(labels = scales::percent) 
+
