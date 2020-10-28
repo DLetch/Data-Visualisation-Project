@@ -167,4 +167,18 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
 
 # Alluvial charts ---------------------------------------------------------
 
+# Documentation:
+# https://cran.r-project.org/web/packages/ggalluvial/vignettes/ggalluvial.html
 
+# Shorten names of Patner/Contributors
+d %>% select(Partner="Partner/contributor",Task, Project,MonthEffort) %>%
+      group_by(Partner, Task, Project, MonthEffort) %>% 
+      summarise(TotEffort=sum(MonthEffort), .groups="keep") %>% 
+      ggplot(aes(axis1=Partner, axis2=Task, axis3=Project,y=TotEffort)) +
+      geom_alluvium(aes(fill=Partner), width = 0, reverse = FALSE) +
+      guides(fill = FALSE) +
+      geom_stratum(width = 1/8, reverse = FALSE) +
+      geom_text(stat = "stratum", aes(label = after_stat(stratum)),
+                reverse = FALSE) +  # Can add a size attribute
+      scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
+      coord_flip()
