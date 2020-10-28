@@ -129,24 +129,6 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
 
 # Project Area ------------------------------------------------------------
 
-# This is not working
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
-      ggplot(aes(x=factor(Month,levels=Months),y=MonthEffort,fill=Partner),colour="black") + 
-      geom_area(stat="identity",position="stack") + xlab("2020") +
-      ylab("Effort (FTE)")
-
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
-      group_by(Month, Project, Partner) %>% 
-      summarise(Effort=sum(MonthEffort),.groups="keep") %>% 
-      ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Project,fill=Project)) +
-      geom_line(aes(colour=Project)) 
-
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
-      group_by(Month, Project, Partner)                               %>% 
-      summarise(Effort=sum(MonthEffort),.groups="keep")               %>% 
-      ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Project,fill=Project)) +
-      geom_line(position="stack",aes(colour=Project)) + geom_area()
-
 d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
       group_by(Month, Project)                                        %>% 
       summarise(Effort=sum(MonthEffort),.groups="keep")               %>% 
@@ -154,6 +136,3 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
       geom_area(aes(colour=Project)) + geom_line(position="stack",colour="black") +
       xlab("2020")
 
-ggplot(d,aes(x=factor(Month,levels=Months),y=MonthEffort,group=Project,fill=Project)) +
-   geom_line(position="stack",aes(colour=Project)) + geom_area() + xlab("2020") +
-   ylab("Effort (FTE)")
