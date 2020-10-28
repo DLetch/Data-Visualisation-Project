@@ -152,7 +152,7 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
    summarise(Effort=sum(MonthEffort),.groups="keep")                  %>% 
    ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Partner,fill=Partner)) +
    geom_area(aes(colour=Partner)) + geom_line(position="stack",colour="black") +
-   xlab("2020") + ggtitle("Effort by Partner/collaborator")
+   xlab("2020") + ggtitle("Effort by Partner/Collaborator")
 
 # Normalised monthly effort by Partner
 d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
