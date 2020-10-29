@@ -6,6 +6,8 @@ library(tidyr)       # To reformat the data
 library(dplyr)       # To manipulate the data
 library(ggplot2)     # To plot the data
 library(ggalluvial)  # For alluvial plots
+library(ggmap)       # For maps
+library(stringr)     # To split lat/long
 
 # Read the data -----------------------------------------------------------
 
@@ -183,6 +185,36 @@ d %>% select(Partner="Partner/contributor",Task, Project,MonthEffort)           
       guides(fill = FALSE) +
       geom_stratum(width = 1/5, reverse = FALSE) +
       geom_text(stat = "stratum", aes(label = after_stat(stratum)),
-                reverse = FALSE, size=2) +  # Can add a size attribute
+                reverse = FALSE, size=2) +  
       scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
       coord_flip() + ylab("Total Effort")
+
+
+# Geographic plot ---------------------------------------------------------
+
+# Use of Google Maps requires you to register to use their maps API, see:
+# https://cran.r-project.org/web/packages/ggmap/readme/README.html
+#
+# OSM not supported, see https://github.com/dkahle/ggmap/issues/117
+
+# Get a GB bounding box, from:
+# https://gist.github.com/graydon/11198540
+gb <- c(-7.57216793459, 49.959999905, 1.68153079591, 58.6350001085)
+gb <- c(-7.58, 49.97, 1.68, 58.64)
+
+# See help for get_stamenmap to see the different type of maptype supported.
+ukmap <- get_stamenmap(gb, zoom = 5, maptype = "watercolor") 
+
+# Take a peek at the map.
+ukmap %>% ggmap() 
+
+# Split lat/long into distinct new columns
+d$lat <- str_split_fixed(d$`Partner latitude/longitude`,",",2)[,1]
+d$lon <- str_split_fixed(d$`Partner latitude/longitude`,",",2)[,2]
+
+# Stack overflow -10368180 for overlaying pie charts on maps
+
+
+
+
+d %>% 
