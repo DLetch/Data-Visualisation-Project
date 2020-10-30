@@ -116,7 +116,7 @@ d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
 
 # Partner effort ----------------------------------------------------------
 
-# Without black lines dlineating the project partners.
+# Without black lines delineating the project partners.
 d %>% select(Partner="Partner/contributor",Month,MonthEffort) %>% 
       ggplot(aes(x=factor(Month,levels=Months),y=MonthEffort,fill=Partner)) + 
       geom_col(aes(group=Partner),position="stack") + xlab("2020") +
@@ -203,18 +203,17 @@ gb <- c(-7.57216793459, 49.959999905, 1.68153079591, 58.6350001085)
 gb <- c(-7.58, 49.97, 1.68, 58.64)
 
 # See help for get_stamenmap to see the different type of maptype supported.
+# watercolor has no labels but looks a bit amateurish.
+# toner-background has no labels but is a bit heavy.
 ukmap <- get_stamenmap(gb, zoom = 5, maptype = "watercolor") 
+ukmap2 <- get_map()
 
 # Take a peek at the map.
 ukmap %>% ggmap() 
 
 # Split lat/long into distinct new columns
-d$lat <- str_split_fixed(d$`Partner latitude/longitude`,",",2)[,1]
-d$lon <- str_split_fixed(d$`Partner latitude/longitude`,",",2)[,2]
+d$lat <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,1])
+d$lon <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,2])
 
 # Stack overflow -10368180 for overlaying pie charts on maps
-
-
-
-
-d %>% 
+ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
