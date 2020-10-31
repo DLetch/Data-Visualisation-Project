@@ -112,7 +112,7 @@ for(i in 1:nrow(data)){
 # Convert the month columns to become row values in a Month column and the 
 # corresponding effort values in a MonthEffort column. This facilitates
 # the plotting when using ggplot.
-d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
+d <- pivot_longer(data,cols=all_of(Months),names_to="Month",values_to="MonthEffort")
 
 # Partner effort ----------------------------------------------------------
 
@@ -206,7 +206,6 @@ gb <- c(-7.58, 49.97, 1.68, 58.64)
 # watercolor has no labels but looks a bit amateurish.
 # toner-background has no labels but is a bit heavy.
 ukmap <- get_stamenmap(gb, zoom = 5, maptype = "watercolor") 
-ukmap2 <- get_map()
 
 # Take a peek at the map.
 ukmap %>% ggmap() 
@@ -217,3 +216,20 @@ d$lon <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,2])
 
 # Stack overflow -10368180 for overlaying pie charts on maps
 ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
+
+# Based on stackoverflow 51398344
+library(scatterpie)
+
+world = map_data("world", resolution=0)
+
+ggplot(data=world, aes(x=long, y=lat, group=group)) + 
+   geom_polygon(data=world, aes(x=long, y=lat), fill="darkseagreen", color="black") + 
+   #coord_map(projection = "mercator",xlim=c(-7.0, 1.68), ylim=c(49,55)) +
+   coord_quickmap(xlim=c(-7.0, 1.68), ylim=c(49,55)) +
+   ylab("Latitude") + xlab("Longitude") + 
+   geom_scatterpie(data = d,aes(x=lon, y=lat), cols="Effort") +
+   theme(
+      panel.background = element_rect(fill="lightsteelblue2"),
+      panel.grid.minor = element_line(colour="grey90", size=0.5), 
+      panel.grid.major = element_line(colour="grey90", size=0.5), 
+      legend.position = "top") 
