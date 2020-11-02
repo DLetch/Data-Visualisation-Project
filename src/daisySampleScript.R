@@ -220,14 +220,18 @@ ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
 # Based on stackoverflow 51398344
 library(scatterpie)
 
+# Load the map
 world = map_data("world", resolution=0)
 
+# scatterpie vignette 
+# https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
 ggplot(data=world, aes(x=long, y=lat, group=group)) + 
    geom_polygon(data=world, aes(x=long, y=lat), fill="darkseagreen", color="black") + 
    #coord_map(projection = "mercator",xlim=c(-7.0, 1.68), ylim=c(49,55)) +
-   coord_quickmap(xlim=c(-7.0, 1.68), ylim=c(49,55)) +
+   coord_quickmap(xlim=c(-5.0, 1.68), ylim=c(50,54)) +
    ylab("Latitude") + xlab("Longitude") + 
-   geom_scatterpie(data = d,aes(x=lon, y=lat), cols="Effort") +
+   geom_scatterpie(data = d,aes(x=lon, y=lat), cols=c("Effort"),pie_scale = 4,
+                   legend_name ="Type",sorted_by_radius = TRUE) +
    theme(
       panel.background = element_rect(fill="lightsteelblue2"),
       panel.grid.minor = element_line(colour="grey90", size=0.5), 
