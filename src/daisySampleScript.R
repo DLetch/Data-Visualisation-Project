@@ -65,7 +65,7 @@ for(i in 1:nrow(data)){
    
    # Check if the project has started
    
-   if(today < Start){
+   if(Today < Start){
       
       # Project has not started, move to the next row
       next
@@ -124,7 +124,7 @@ for(i in 1:nrow(data)){
 # Convert the month columns to become row values in a Month column and the 
 # corresponding effort values in a MonthEffort column. This facilitates
 # the plotting when using ggplot.
-d <- pivot_longer(data,cols=all_of(Months),names_to="Month",values_to="MonthEffort")
+d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
 
 # Partner effort ----------------------------------------------------------
 
