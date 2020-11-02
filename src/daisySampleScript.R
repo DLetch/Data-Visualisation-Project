@@ -1,11 +1,17 @@
 # These packages need to be loaded (or installed if not present).
 
-library(readxl)      # To read the spreadsheet with synthetic data
-library(lubridate)   # To deal with date data
-library(tidyr)       # To reformat the data
-library(dplyr)       # To manipulate the data
-library(ggplot2)     # To plot the data
-library(ggalluvial)  # For alluvial plots
+library(readxl)     
+# To read the spreadsheet with synthetic data
+library(lubridate)   
+# To deal with date data
+library(tidyr)      
+# To reformat the data
+library(dplyr)       
+# To manipulate the data
+library(ggplot2)    
+# To plot the data
+library(ggalluvial)  
+# For alluvial plots
 
 # Read the data -----------------------------------------------------------
 
@@ -15,7 +21,7 @@ library(ggalluvial)  # For alluvial plots
 # do More -> Set as working directory.
 
 # Read the synthetic data into a tibble
-data <- read_xlsx("../data/Synthetic_data.xlsx")
+data <- read_xlsx("/Users/dletch/OneDrive - The Alan Turing Institute/Documents/R Studio/DaisyProject/data/September_data.xlsx")
 
 
 # Data transformations -----------------------------------------------------
@@ -42,17 +48,20 @@ data$EffortPerDay <- ifelse(data$End <= rep(Today,nrow(data)),
 
 # Loop over the rows to get the days used to calculate the effort - it does not 
 # take into account years. For years another inner loop would have to be added.
+
 for(i in 1:nrow(data)){
    
    # Dates of start and end of project
-   Start <- data[i,"Start"]
-   End <- data[i,"End"]
+   Start <- data[i,"20200501"]
+   End <- data[i,"20200531"]
    
    # Get the effort per day
-   EffortPerDay <- data[i,"EffortPerDay"]
+   EffortPerDay <- data[i,"0.195"]
    
    # Check if the project has started
+   
    if(today < Start){
+      
       # Project has not started, move to the next row
       next
    }
