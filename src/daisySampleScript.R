@@ -1,5 +1,6 @@
 # These packages need to be loaded (or installed if not present).
 
+
 library(readxl)     
 # To read the spreadsheet with synthetic data
 library(lubridate)   
@@ -12,6 +13,10 @@ library(ggplot2)
 # To plot the data
 library(ggalluvial)  
 # For alluvial plots
+
+library(ggmap)       # For maps
+library(stringr)     # To split lat/long
+
 
 # Read the data -----------------------------------------------------------
 
@@ -119,11 +124,11 @@ for(i in 1:nrow(data)){
 # Convert the month columns to become row values in a Month column and the 
 # corresponding effort values in a MonthEffort column. This facilitates
 # the plotting when using ggplot.
-d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
+d <- pivot_longer(data,cols=all_of(Months),names_to="Month",values_to="MonthEffort")
 
 # Partner effort ----------------------------------------------------------
 
-# Without black lines dlineating the project partners.
+# Without black lines delineating the project partners.
 d %>% select(Partner="Partner/contributor",Month,MonthEffort) %>% 
       ggplot(aes(x=factor(Month,levels=Months),y=MonthEffort,fill=Partner)) + 
       geom_col(aes(group=Partner),position="stack") + xlab("2020") +
@@ -192,6 +197,55 @@ d %>% select(Partner="Partner/contributor",Task, Project,MonthEffort)           
       guides(fill = FALSE) +
       geom_stratum(width = 1/5, reverse = FALSE) +
       geom_text(stat = "stratum", aes(label = after_stat(stratum)),
-                reverse = FALSE, size=2) +  # Can add a size attribute
+                reverse = FALSE, size=2) +  
       scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
       coord_flip() + ylab("Total Effort")
+
+
+# Geographic plot ---------------------------------------------------------
+
+# Use of Google Maps requires you to register to use their maps API, see:
+# https://cran.r-project.org/web/packages/ggmap/readme/README.html
+#
+# OSM not supported, see https://github.com/dkahle/ggmap/issues/117
+
+# Get a GB bounding box, from:
+# https://gist.github.com/graydon/11198540
+gb <- c(-7.57216793459, 49.959999905, 1.68153079591, 58.6350001085)
+gb <- c(-7.58, 49.97, 1.68, 58.64)
+
+# See help for get_stamenmap to see the different type of maptype supported.
+# watercolor has no labels but looks a bit amateurish.
+# toner-background has no labels but is a bit heavy.
+ukmap <- get_stamenmap(gb, zoom = 5, maptype = "watercolor") 
+
+# Take a peek at the map.
+ukmap %>% ggmap() 
+
+# Split lat/long into distinct new columns
+d$lat <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,1])
+d$lon <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,2])
+
+# Stack overflow -10368180 for overlaying pie charts on maps
+ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
+
+# Based on stackoverflow 51398344
+library(scatterpie)
+
+# Load the map
+world = map_data("world", resolution=0)
+
+# scatterpie vignette 
+# https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
+ggplot(data=world, aes(x=long, y=lat, group=group)) + 
+   geom_polygon(data=world, aes(x=long, y=lat), fill="darkseagreen", color="black") + 
+   #coord_map(projection = "mercator",xlim=c(-7.0, 1.68), ylim=c(49,55)) +
+   coord_quickmap(xlim=c(-5.0, 1.68), ylim=c(50,54)) +
+   ylab("Latitude") + xlab("Longitude") + 
+   geom_scatterpie(data = d,aes(x=lon, y=lat), cols=c("Effort"),pie_scale = 4,
+                   legend_name ="Type",sorted_by_radius = TRUE) +
+   theme(
+      panel.background = element_rect(fill="lightsteelblue2"),
+      panel.grid.minor = element_line(colour="grey90", size=0.5), 
+      panel.grid.major = element_line(colour="grey90", size=0.5), 
+      legend.position = "top") 
