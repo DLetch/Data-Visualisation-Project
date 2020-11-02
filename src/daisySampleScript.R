@@ -217,7 +217,7 @@ d$lon <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,2])
 # Stack overflow -10368180 for overlaying pie charts on maps
 ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
 
-# Based on stackoverflow 51398344
+# Based on stackoverflow - 51398344
 library(scatterpie)
 
 # Load the map
