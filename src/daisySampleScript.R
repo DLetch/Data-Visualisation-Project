@@ -28,13 +28,13 @@ library(stringr)     # To split lat/long
 # Read the synthetic data into a tibble
 data <- read_xlsx("../data/September_data.xlsx")
 
-
 # Data transformations -----------------------------------------------------
 
 # Convert data into dates but put in new columns
 data$Start <- ymd(data$`Start date`)
 data$End <- ymd(data$`End date`)
 
+# Months in a year
 Months <- c("Jan","Feb","Mar","Apr","May","Jun","Jul", "Aug","Sep","Oct","Nov","Dec")
 
 # Create multiple new columns for months - stackoverflow 25357194 and initialise
@@ -124,59 +124,60 @@ for(i in 1:nrow(data)){
 # Convert the month columns to become row values in a Month column and the 
 # corresponding effort values in a MonthEffort column. This facilitates
 # the plotting when using ggplot.
-d <- pivot_longer(data,cols=Months,names_to="Month",values_to="MonthEffort")
+d <- pivot_longer(data,cols=Months,names_to="ProjectMonth",values_to="MonthEffort",
+                  names_repair = "unique")
 
 # Partner effort ----------------------------------------------------------
 
 # Without black lines delineating the project partners.
-d %>% select(Partner="Partner/contributor",Month,MonthEffort) %>% 
-      ggplot(aes(x=factor(Month,levels=Months),y=MonthEffort,fill=Partner)) + 
-      geom_col(aes(group=Partner),position="stack") + xlab("2020") +
+d %>% select(Contributor,ProjectMonth,MonthEffort) %>% 
+      ggplot(aes(x=factor(ProjectMonth,levels=Months),y=MonthEffort,fill=Contributor)) + 
+      geom_col(aes(group=Contributor),position="stack") + xlab("2020") +
       ylab("Effort (FTE)")
 
 # With black lines delineating the project partner segments.
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
-   group_by(Month,Partner)                                            %>% 
-   summarise(Effort=sum(MonthEffort))                                 %>% 
-   ggplot(aes(x=factor(Month,levels=Months),y=Effort,fill=Partner)) + 
-   geom_col(aes(group=Partner),position="stack",colour="black") + xlab("2020") +
+d %>% select(Contributor,ProjectMonth,MonthEffort,Project)            %>% 
+   group_by(ProjectMonth,Contributor)                                 %>% 
+   summarise(Effort=sum(MonthEffort),.groups="keep")                  %>% 
+   ggplot(aes(x=factor(ProjectMonth,levels=Months),y=Effort,fill=Contributor)) + 
+   geom_col(aes(group=Contributor),position="stack",colour="black") + xlab("2020") +
    ylab("Effort (FTE)")
 
 # Effort Area Charts ------------------------------------------------------------
 
 # Monthly effort by Project
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
-      group_by(Month, Project)                                        %>% 
+d %>% select(Contributor,ProjectMonth,MonthEffort,Project)           %>% 
+      group_by(ProjectMonth, Project)                                 %>% 
       summarise(Effort=sum(MonthEffort),.groups="keep")               %>% 
-      ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Project,fill=Project)) +
+      ggplot(aes(x=factor(ProjectMonth,levels=Months),y=Effort,group=Project,fill=Project)) +
       geom_area(aes(colour=Project)) + geom_line(position="stack",colour="black") +
       xlab("2020") + ggtitle("Effort by Project")
 
 # Normalised monthly effort by Project - warning from zero values in plots I think
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
-   group_by(Month, Project)                                        %>% 
+d %>% select(Contributor,ProjectMonth,MonthEffort,Project) %>% 
+   group_by(ProjectMonth, Project)                                        %>% 
    summarise(Effort=sum(MonthEffort),.groups="keep")               %>% 
-   ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Project,fill=Project)) +
+   ggplot(aes(x=factor(ProjectMonth,levels=Months),y=Effort,group=Project,fill=Project)) +
    geom_area(aes(colour=Project),position="fill") + geom_line(position="fill",colour="black") +
    xlab("2020") + ggtitle("Normlised effort by Project") + 
    ylab("% Effort for project") + scale_y_continuous(labels = scales::percent) 
 
 # Monthly effort by Partner
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
-   group_by(Month, Partner,.drop=FALSE)                               %>% 
+d %>% select(Contributor,ProjectMonth,MonthEffort,Project) %>% 
+   group_by(ProjectMonth, Contributor,.drop=FALSE)                               %>% 
    summarise(Effort=sum(MonthEffort),.groups="keep")                  %>% 
-   ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Partner,fill=Partner)) +
-   geom_area(aes(colour=Partner)) + geom_line(position="stack",colour="black") +
-   xlab("2020") + ggtitle("Effort by Partner/Contributor")
+   ggplot(aes(x=factor(ProjectMonth,levels=Months),y=Effort,group=Contributor,fill=Contributor)) +
+   geom_area(aes(colour=Contributor)) + geom_line(position="stack",colour="black") +
+   xlab("2020") + ggtitle("Effort by Contributor")
 
 # Normalised monthly effort by Partner (warnings for the same reason)
-d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>% 
-   group_by(Month, Partner,.drop=FALSE)                               %>% 
+d %>% select(Contributor,ProjectMonth,MonthEffort,Project) %>% 
+   group_by(ProjectMonth, Contributor,.drop=FALSE)                               %>% 
    summarise(Effort=sum(MonthEffort),.groups="keep")                  %>% 
-   ggplot(aes(x=factor(Month,levels=Months),y=Effort,group=Partner,fill=Partner)) +
-   geom_area(aes(colour=Partner),position="fill") + geom_line(position="fill",colour="black") +
-   xlab("2020") + ggtitle("Normalised effort by Partner/collaborator") + 
-   ylab("% Effort for Partner/Contributor") + scale_y_continuous(labels = scales::percent) 
+   ggplot(aes(x=factor(ProjectMonth,levels=Months),y=Effort,group=Contributor,fill=Contributor)) +
+   geom_area(aes(colour=Contributor),position="fill") + geom_line(position="fill",colour="black") +
+   xlab("2020") + ggtitle("Normalised effort by Contributor") + 
+   ylab("% Effort for Contributor") + scale_y_continuous(labels = scales::percent) 
 
 
 # Alluvial charts ---------------------------------------------------------
@@ -185,8 +186,8 @@ d %>% select(Partner="Partner/contributor",Month,MonthEffort,Project) %>%
 # https://cran.r-project.org/web/packages/ggalluvial/vignettes/ggalluvial.html
 
 # Shorten names of Partner/Contributors
-d %>% select(Partner="Partner/contributor",Task, Project,MonthEffort)                  %>%
-      mutate(Partner=replace(Partner,Partner=="British Heart Foundation","BHF"))       %>% 
+d %>% select(Partner=Contributor,Task, Project,MonthEffort)                  %>%
+      mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))       %>% 
       mutate(Partner=replace(Partner,Partner=="Intel Corporation","Intel"))            %>% 
       mutate(Partner=replace(Partner,Partner=="Office for National Statistics","ONS")) %>% 
       mutate(Task=gsub("/","/\n",Task))                                                %>% 
