@@ -26,7 +26,7 @@ library(stringr)     # To split lat/long
 # do More -> Set as working directory.
 
 # Read the synthetic data into a tibble
-data <- read_xlsx("/Users/dletch/OneDrive - The Alan Turing Institute/Documents/R Studio/DaisyProject/data/September_data.xlsx")
+data <- read_xlsx("../data/September_data.xlsx")
 
 
 # Data transformations -----------------------------------------------------
@@ -57,11 +57,11 @@ data$EffortPerDay <- ifelse(data$End <= rep(Today,nrow(data)),
 for(i in 1:nrow(data)){
    
    # Dates of start and end of project
-   Start <- data[i,"20200501"]
-   End <- data[i,"20200531"]
+   Start <- data[i,"Start"]
+   End <- data[i,"End"]
    
    # Get the effort per day
-   EffortPerDay <- data[i,"0.195"]
+   EffortPerDay <- data[i,"EffortPerDay"]
    
    # Check if the project has started
    
