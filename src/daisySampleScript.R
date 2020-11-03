@@ -244,8 +244,8 @@ ukmap <- get_stamenmap(gb, zoom = 5, maptype = "watercolor")
 ukmap %>% ggmap() 
 
 # Split lat/long into distinct new columns
-d$lat <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,1])
-d$lon <- as.numeric(str_split_fixed(d$`Partner latitude/longitude`,",",2)[,2])
+d$lat <- as.numeric(str_split_fixed(d$Contributor_Lat_Long ,",",2)[,1])
+d$lon <- as.numeric(str_split_fixed(d$Contributor_Lat_Long,",",2)[,2])
 
 # Stack overflow -10368180 for overlaying pie charts on maps
 ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
@@ -258,6 +258,7 @@ world = map_data("world", resolution=0)
 
 # scatterpie vignette 
 # https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
+
 ggplot(data=world, aes(x=long, y=lat, group=group)) + 
    geom_polygon(data=world, aes(x=long, y=lat), fill="darkseagreen", color="black") + 
    #coord_map(projection = "mercator",xlim=c(-7.0, 1.68), ylim=c(49,55)) +
