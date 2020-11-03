@@ -186,10 +186,11 @@ d %>% select(Contributor,ProjectMonth,MonthEffort,Project) %>%
 # https://cran.r-project.org/web/packages/ggalluvial/vignettes/ggalluvial.html
 
 # Shorten names of Partner/Contributors
-d %>% select(Partner=Contributor,Task, Project,MonthEffort)                  %>%
-      mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))       %>% 
-      mutate(Partner=replace(Partner,Partner=="Intel Corporation","Intel"))            %>% 
-      mutate(Partner=replace(Partner,Partner=="Office for National Statistics","ONS")) %>% 
+d %>% select(Partner=Contributor,Task, Project,MonthEffort)                            %>%
+      mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))          %>% 
+      mutate(Partner=replace(Partner,Partner=="University of Cambridge","UoC"))        %>% 
+      mutate(Partner=replace(Partner,Partner=="University of Exeter","UoE"))           %>% 
+      mutate(Partner=replace(Partner,Partner=="University of Leeds","UoL"))            %>% 
       mutate(Task=gsub("/","/\n",Task))                                                %>% 
       group_by(Partner, Task, Project, MonthEffort)                                    %>% 
       summarise(TotEffort=sum(MonthEffort), .groups="keep")                            %>% 
