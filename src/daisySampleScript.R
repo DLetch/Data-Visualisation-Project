@@ -187,11 +187,12 @@ d %>% select(Contributor,ProjectMonth,MonthEffort,Project) %>%
 
 # Shorten names of Partner/Contributors
 d %>% select(Partner=Contributor,Task, Project,MonthEffort)                            %>%
-      mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))          %>% 
+      mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))          %>% # Shorten names
       mutate(Partner=replace(Partner,Partner=="University of Cambridge","UoC"))        %>% 
       mutate(Partner=replace(Partner,Partner=="University of Exeter","UoE"))           %>% 
       mutate(Partner=replace(Partner,Partner=="University of Leeds","UoL"))            %>% 
-      mutate(Task=gsub("/","/\n",Task))                                                %>% 
+      mutate(Task=gsub("/","/\n",Task))                                                %>% # Add a new line after a "/"
+      mutate(Task=gsub("&","&\n",Task))                                                %>%   
       group_by(Partner, Task, Project, MonthEffort)                                    %>% 
       summarise(TotEffort=sum(MonthEffort), .groups="keep")                            %>% 
       ggplot(aes(axis1=Partner, axis2=Task, axis3=Project,y=TotEffort)) +
@@ -199,10 +200,28 @@ d %>% select(Partner=Contributor,Task, Project,MonthEffort)                     
       guides(fill = FALSE) +
       geom_stratum(width = 1/5, reverse = FALSE) +
       geom_text(stat = "stratum", aes(label = after_stat(stratum)),
-                reverse = FALSE, size=2) +  
+                reverse = FALSE,  size=1.5) +  # Add: check_overlap = TRUE, to the arguments - wil not print text if it overlaps previous text
       scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
       coord_flip() + ylab("Total Effort")
 
+# Using facets
+d %>% select(Partner=Contributor,Task, Project,MonthEffort)                            %>%
+   mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))          %>% # Shorten names
+   mutate(Partner=replace(Partner,Partner=="University of Cambridge","UoC"))        %>% 
+   mutate(Partner=replace(Partner,Partner=="University of Exeter","UoE"))           %>% 
+   mutate(Partner=replace(Partner,Partner=="University of Leeds","UoL"))            %>% 
+   mutate(Task=gsub("/","/\n",Task))                                                %>% # Add a new line after a "/"
+   mutate(Task=gsub("&","&\n",Task))                                                %>%   
+   group_by(Partner, Task, Project, MonthEffort)                                    %>% 
+   summarise(TotEffort=sum(MonthEffort), .groups="keep")                            %>% 
+   ggplot(aes(axis1=Partner, axis2=Task, axis3=Project,y=TotEffort)) +
+   geom_alluvium(aes(fill=Partner), width = 0, reverse = FALSE) +
+   guides(fill = FALSE) +
+   geom_stratum(width = 1/5, reverse = FALSE) +
+   geom_text(stat = "stratum", aes(label = after_stat(stratum)),
+             reverse = FALSE, size=2) +  
+   scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
+   coord_flip() + ylab("Total Effort") + facet_wrap(~Project)
 
 # Geographic plot ---------------------------------------------------------
 
