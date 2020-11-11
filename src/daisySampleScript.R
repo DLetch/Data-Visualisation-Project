@@ -262,6 +262,9 @@ d %>%  select(Contributor, Task, MonthEffort, lon, lat) %>%
    summarise(TotEffort=sum(MonthEffort),.groups="drop") %>% 
    pivot_wider(names_from = Task, values_from=TotEffort, values_fill=0) -> e
 
+cc <- e$Contributor
+e$Contributor <- as.numeric(rownames(e))
+
 # scatterpie vignette 
 # https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
 
@@ -269,8 +272,8 @@ ggplot(data=world, aes(x=long, y=lat, group=group)) +
    geom_polygon(data=world, aes(x=long, y=lat), fill="darkseagreen", color="black") + 
    coord_quickmap(xlim=c(-5.0, 1.68), ylim=c(50,54)) +
    ylab("Latitude") + xlab("Longitude") + 
-   geom_scatterpie(data = e,aes(x=lon, y=lat, group=Contributor), cols=4:ncol(e),pie_scale = 4,
-                   legend_name ="Type",sorted_by_radius = TRUE,fill="blue") +
+   geom_scatterpie(data = e,aes(x=lon, y=lat, group=Contributor, cols=names(e)[4:ncol(e)]),pie_scale = 4,
+                   legend_name ="Task",sorted_by_radius = TRUE,fill="blue") +
    theme(
       panel.background = element_rect(fill="lightsteelblue2"),
       panel.grid.minor = element_line(colour="grey90", size=0.5), 
