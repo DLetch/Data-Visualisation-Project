@@ -230,6 +230,10 @@ d %>% select(Partner=Contributor,Task, Project,MonthEffort)                     
 #
 # OSM not supported, see https://github.com/dkahle/ggmap/issues/117
 
+library("ggmap")
+
+register_google(key = "[AIzaSyDVi448rEZF8gAr62b3MW1UxH7WV3Mzbjk]")
+
 # Get a GB bounding box, from:
 # https://gist.github.com/graydon/11198540
 gb <- c(-7.57216793459, 49.959999905, 1.68153079591, 58.6350001085)
