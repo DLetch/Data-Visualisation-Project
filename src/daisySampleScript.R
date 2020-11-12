@@ -13,6 +13,7 @@ library(ggplot2)
 library(ggalluvial)  
 # For alluvial plots
 
+library(tibble)      # To add columns
 library(ggmap)       # For maps
 library(stringr)     # To split lat/long
 library(scatterpie)  # For piecharts
