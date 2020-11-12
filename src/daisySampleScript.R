@@ -15,6 +15,7 @@ library(ggalluvial)
 
 library(ggmap)       # For maps
 library(stringr)     # To split lat/long
+library(scatterpie)  # For piecharts
 
 
 # Read the data -----------------------------------------------------------
@@ -249,16 +250,15 @@ d$lon <- as.numeric(str_split_fixed(d$Contributor_Lat_Long,",",2)[,2])
 # Stack overflow -10368180 for overlaying pie charts on maps
 ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
 
-# Based on stackoverflow - 51398344
-library(scatterpie)
+# Use scatterpie - based on stackoverflow - 51398344
 
 # Load the map
 world = map_data("world", resolution=0)
 
 # Remap the data
-d %>%  select(Contributor, Task, MonthEffort, lon, lat)  %>% 
-   group_by(Contributor, lon, lat, Task,.drop = FALSE)   %>% 
-   summarise(TotEffort=sum(MonthEffort),.groups="drop")  %>% 
+d %>%  dplyr::select(Contributor, Task, MonthEffort, lon, lat)  %>% 
+   group_by(Contributor, lon, lat, Task,.drop = FALSE)          %>% 
+   summarise(TotEffort=sum(MonthEffort),.groups="drop")         %>% 
    pivot_wider(names_from = Task, values_from=TotEffort, values_fill=0) -> e
 
 # Convert the Contributors into a factor as it expects this
