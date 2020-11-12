@@ -259,11 +259,17 @@ ggmap(ukmap) + geom_point(data=d,aes(x=lon,y=lat))
 # Load the map
 world = map_data("world", resolution=0)
 
-# Remap the data
-d %>%  dplyr::select(Contributor, Task, MonthEffort, lon, lat)  %>% 
-   group_by(Contributor, lon, lat, Task,.drop = FALSE)          %>% 
-   summarise(TotEffort=sum(MonthEffort),.groups="drop")         %>% 
-   pivot_wider(names_from = Task, values_from=TotEffort, values_fill=0) -> e
+# Remap the data to use with scatterpie
+d %>% dplyr::select(Contributor, Task, MonthEffort, lon, lat)  %>% 
+      group_by(Contributor, lon, lat, Task,.drop = FALSE)      %>% 
+      summarise(TotEffort=sum(MonthEffort),.groups="drop")     %>% 
+      pivot_wider(names_from = Task, values_from=TotEffort, values_fill=0) -> e
+
+# Rename some of the labels to shorten them
+e$Contributor <- gsub("Alan Turing Institute","ATI",e$Contributor)
+e$Contributor <- gsub("University of Exeter","UoE",e$Contributor)
+e$Contributor <- gsub("University of Leeds","UoL",e$Contributor)
+e$Contributor <- gsub("University of Cambridge","UoC",e$Contributor)
 
 # Convert the Contributors into a factor as it expects this
 e$Contributor <- factor(e$Contributor)
@@ -275,6 +281,50 @@ tasks <- names(e)[4:ncol(e)]
 e <- add_column(e,lon2=e$lon,.after=3)
 e <- add_column(e,lat2=e$lat,.after=4)
 
+# Manually giving the coords an offset - have not found a clever way of doing
+# this for geom_scatterpie.
+offset <- 0.25
+# r <- sample.int(nrow(e))
+# e$lon2 <- e$lon2 + (-1)**r * offset
+# e$lat2 <- e$lat2 + (-1)**r * offset
+
+# e[e$Contributor == "Alan Turing Institute","lon2"] <- e[e$Contributor == "Alan Turing Institute","lon2"] + offset
+# e[e$Contributor == "Alan Turing Institute","lat2"] <- e[e$Contributor == "Alan Turing Institute","lat2"] + offset
+
+e[e$Contributor == "ATI","lon2"] <- e[e$Contributor == "ATI","lon2"] + offset
+e[e$Contributor == "ATI","lat2"] <- e[e$Contributor == "ATI","lat2"] + offset
+
+e[e$Contributor == "UCL","lon2"] <- e[e$Contributor == "UCL","lon2"] - offset
+e[e$Contributor == "UCL","lat2"] <- e[e$Contributor == "UCL","lat2"] - offset
+
+e[e$Contributor == "UCLH","lon2"] <- e[e$Contributor == "UCLH","lon2"] - offset
+e[e$Contributor == "UCLH","lat2"] <- e[e$Contributor == "UCLH","lat2"] + offset
+
+e[e$Contributor == "REG","lon2"] <- e[e$Contributor == "REG","lon2"] + offset
+e[e$Contributor == "REG","lat2"] <- e[e$Contributor == "REG","lat2"] - offset
+
+# e[e$Contributor == "University of Cambridge","lon2"] <- e[e$Contributor == "University of Cambridge","lon2"] + offset
+# e[e$Contributor == "University of Cambridge","lat2"] <- e[e$Contributor == "University of Cambridge","lat2"] + offset
+e[e$Contributor == "UoC","lon2"] <- e[e$Contributor == "UoC","lon2"] + offset
+e[e$Contributor == "UoC","lat2"] <- e[e$Contributor == "UoC","lat2"] + offset
+
+
+# e[e$Contributor == "University of Exeter","lon2"] <- e[e$Contributor == "University of Exeter","lon2"] - offset
+# e[e$Contributor == "University of Exeter","lat2"] <- e[e$Contributor == "University of Exeter","lat2"] + offset
+e[e$Contributor == "UoE","lon2"] <- e[e$Contributor == "UoE","lon2"] - offset
+e[e$Contributor == "UoE","lat2"] <- e[e$Contributor == "UoE","lat2"] + offset
+
+e[e$Contributor == "UHB","lon2"] <- e[e$Contributor == "UHB","lon2"] - offset
+e[e$Contributor == "UHB","lat2"] <- e[e$Contributor == "UHB","lat2"] - offset
+
+e[e$Contributor == "MRC Harwell","lon2"] <- e[e$Contributor == "MRC Harwell","lon2"] - offset
+e[e$Contributor == "MRC Harwell","lat2"] <- e[e$Contributor == "MRC Harwell","lat2"] - offset
+
+# e[e$Contributor == "University of Leeds","lon2"] <- e[e$Contributor == "University of Leeds","lon2"] - offset
+# e[e$Contributor == "University of Leeds","lat2"] <- e[e$Contributor == "University of Leeds","lat2"] - offset
+e[e$Contributor == "UoL","lon2"] <- e[e$Contributor == "UoL","lon2"] - offset
+e[e$Contributor == "UoL","lat2"] <- e[e$Contributor == "UoLs","lat2"] - offset
+
 # scatterpie vignette 
 # https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
 ggplot(data=world, aes(x=long, y=lat, group=group)) + 
@@ -282,9 +332,10 @@ ggplot(data=world, aes(x=long, y=lat, group=group)) +
    coord_quickmap(xlim=c(-5.0, 1.68), ylim=c(50,54)) +
    ylab("Latitude") + xlab("Longitude") + 
    geom_point(aes(x=lon,y=lat),data=e, inherit.aes = FALSE) +
-   geom_scatterpie(data = e,aes(x=lon2, y=lat2, group=Contributor), cols=tasks ,pie_scale = 2,
+   geom_scatterpie(data = e,aes(x=lon2, y=lat2, group=Contributor), cols=tasks ,pie_scale = 3,
                    legend_name ="Tasks",sorted_by_radius = TRUE) +
-   #geom_jitter(aes(x=lon2,y=lat2),data=e, inherit.aes = FALSE,width = 1,height = 1) +
+   geom_label_repel(aes(x=lon2,y=lat2,label= Contributor), data=e,
+                    size=2, inherit.aes = FALSE, force=5) +
    theme(
       panel.background = element_rect(fill="lightsteelblue2"),
       panel.grid.minor = element_line(colour="grey90", size=0.5), 
