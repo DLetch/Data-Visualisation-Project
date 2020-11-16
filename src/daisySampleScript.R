@@ -19,8 +19,6 @@ library(stringr)     # To split lat/long
 library(scatterpie)  # For piecharts
 library(ggrepel)     
 
-install.packages("ggrepel")
-
 # Read the data -----------------------------------------------------------
 
 # Make sure that the working directory is where the script is located as the
