@@ -17,7 +17,9 @@ library(tibble)      # To add columns
 library(ggmap)       # For maps
 library(stringr)     # To split lat/long
 library(scatterpie)  # For piecharts
+library(ggrepel)     
 
+install.packages("ggrepel")
 
 # Read the data -----------------------------------------------------------
 
@@ -324,7 +326,7 @@ e[e$Contributor == "MRC Harwell","lat2"] <- e[e$Contributor == "MRC Harwell","la
 # e[e$Contributor == "University of Leeds","lon2"] <- e[e$Contributor == "University of Leeds","lon2"] - offset
 # e[e$Contributor == "University of Leeds","lat2"] <- e[e$Contributor == "University of Leeds","lat2"] - offset
 e[e$Contributor == "UoL","lon2"] <- e[e$Contributor == "UoL","lon2"] - offset
-e[e$Contributor == "UoL","lat2"] <- e[e$Contributor == "UoLs","lat2"] - offset
+e[e$Contributor == "UoL","lat2"] <- e[e$Contributor == "UoL","lat2"] - offset
 
 # scatterpie vignette 
 # https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
