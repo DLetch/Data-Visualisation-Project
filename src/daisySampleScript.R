@@ -17,7 +17,7 @@ library(tibble)      # To add columns
 library(ggmap)       # For maps
 library(stringr)     # To split lat/long
 library(scatterpie)  # For piecharts
-library(ggrepel)     
+library(ggrepel)     # For non-overlapping labels
 
 # Read the data -----------------------------------------------------------
 
