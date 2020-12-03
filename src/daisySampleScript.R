@@ -194,6 +194,7 @@ d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)              
       mutate(Partner=replace(Partner,Partner=="University of Cambridge","UoC"))        %>% 
       mutate(Partner=replace(Partner,Partner=="University of Exeter","UoE"))           %>% 
       mutate(Partner=replace(Partner,Partner=="University of Leeds","UoL"))            %>% 
+      mutate(Partner=replace(Partner,Partner=="University of Liverpool","UoLiv"))      %>% 
       mutate(Task=gsub("/","/\n",Task))                                                %>% # Add a new line after a "/"
       mutate(Task=gsub("&","&\n",Task))                                                %>%   
       group_by(Partner, Task, Project, MonthEffort)                                    %>% 
@@ -213,6 +214,7 @@ d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)              
    mutate(Partner=replace(Partner,Partner=="University of Cambridge","UoC"))        %>% 
    mutate(Partner=replace(Partner,Partner=="University of Exeter","UoE"))           %>% 
    mutate(Partner=replace(Partner,Partner=="University of Leeds","UoL"))            %>% 
+   mutate(Partner=replace(Partner,Partner=="University of Liverpool","UoLiv"))      %>% 
    mutate(Task=gsub("/","/\n",Task))                                                %>% # Add a new line after a "/"
    mutate(Task=gsub("&","&\n",Task))                                                %>%   
    group_by(Partner, Task, Project, MonthEffort)                                    %>% 
@@ -273,6 +275,7 @@ e$Contributor <- gsub("Alan Turing Institute","ATI",e$Contributor)
 e$Contributor <- gsub("University of Exeter","UoE",e$Contributor)
 e$Contributor <- gsub("University of Leeds","UoL",e$Contributor)
 e$Contributor <- gsub("University of Cambridge","UoC",e$Contributor)
+e$Contributor <- gsub("University of Liverpool","UoLiv",e$Contributor)
 
 # Convert the Contributors into a factor as it expects this
 e$Contributor <- factor(e$Contributor)
@@ -327,6 +330,11 @@ e[e$Contributor == "MRC Harwell","lat2"] <- e[e$Contributor == "MRC Harwell","la
 # e[e$Contributor == "University of Leeds","lat2"] <- e[e$Contributor == "University of Leeds","lat2"] - offset
 e[e$Contributor == "UoL","lon2"] <- e[e$Contributor == "UoL","lon2"] - offset
 e[e$Contributor == "UoL","lat2"] <- e[e$Contributor == "UoL","lat2"] - offset
+
+# e[e$Contributor == "University of Liverpool","lon2"] <- e[e$Contributor == "University of Liverpool","lon2"] - offset
+# e[e$Contributor == "University of Liverpool","lat2"] <- e[e$Contributor == "University of Liverpool","lat2"] - offset
+e[e$Contributor == "UoLiv","lon2"] <- e[e$Contributor == "UoLiv","lon2"] - offset
+e[e$Contributor == "UoLiv","lat2"] <- e[e$Contributor == "UoLiv","lat2"] - offset
 
 # scatterpie vignette 
 # https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
