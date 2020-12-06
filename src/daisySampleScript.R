@@ -18,6 +18,7 @@ library(ggmap)       # For maps
 library(stringr)     # To split lat/long
 library(scatterpie)  # For piecharts
 library(ggrepel)     # For non-overlapping labels
+library(ggfittext)
 
 # Read the data -----------------------------------------------------------
 
@@ -201,9 +202,28 @@ d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)              
       guides(fill = FALSE) +
       geom_stratum(width = 1/5, reverse = FALSE) +
       geom_text(stat = "stratum", aes(label = after_stat(stratum)),
-                reverse = FALSE,  size=1.5) +  # Add: check_overlap = TRUE, to the arguments - wil not print text if it overlaps previous text
+               reverse = FALSE,  size=1.5) +  # Add: check_overlap = TRUE, to the arguments - wil not print text if it overlaps previous text
       scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
       coord_flip() + ylab("Total Effort")
+
+# Shorten names of Partner/Contributors -try ggfixtext
+d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)                     %>%
+   mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))          %>% # Shorten names
+   mutate(Partner=replace(Partner,Partner=="University of Cambridge","UoC"))        %>% 
+   mutate(Partner=replace(Partner,Partner=="University of Exeter","UoE"))           %>% 
+   mutate(Partner=replace(Partner,Partner=="University of Leeds","UoL"))            %>% 
+   mutate(Task=gsub("/","/\n",Task))                                                %>% # Add a new line after a "/"
+   mutate(Task=gsub("&","&\n",Task))                                                %>%   
+   group_by(Partner, Task, Project, MonthEffort)                                    %>% 
+   summarise(TotEffort=sum(MonthEffort), .groups="keep")                            %>% 
+   ggplot(aes(axis1=Partner, axis2=Task, axis3=Project,y=TotEffort)) +
+   geom_alluvium(aes(fill=Partner), width = 0, reverse = FALSE) +
+   guides(fill = FALSE) +
+   geom_stratum(width = 1/5, reverse = FALSE) +
+   geom_fit_text(aes(label = after_stat(stratum)),
+                 stat = "stratum", width = 1/4, min.size = 2) + 
+   scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
+   coord_flip() + ylab("Total Effort")
 
 # Using facets
 d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)                  %>%
@@ -336,7 +356,7 @@ ggplot(data=world, aes(x=long, y=lat, group=group)) +
    geom_scatterpie(data = e,aes(x=lon2, y=lat2, group=Contributor), cols=tasks ,pie_scale = 3,
                    legend_name ="Tasks",sorted_by_radius = TRUE) +
    geom_label_repel(aes(x=lon2,y=lat2,label= Contributor), data=e,
-                    size=2, inherit.aes = FALSE, force=5) +
+                    size=2, inherit.aes = FALSE, force=5, alpha=0.5) +
    theme(
       panel.background = element_rect(fill="lightsteelblue2"),
       panel.grid.minor = element_line(colour="grey90", size=0.5), 
