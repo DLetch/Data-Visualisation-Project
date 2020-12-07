@@ -357,7 +357,7 @@ ggplot(data=world, aes(x=long, y=lat, group=group)) +
    geom_scatterpie(data = e,aes(x=lon2, y=lat2, group=Contributor), cols=tasks ,pie_scale = 3,
                    legend_name ="Tasks",sorted_by_radius = TRUE) +
    geom_label_repel(aes(x=lon2,y=lat2,label= Contributor), data=e,
-                    size=2, inherit.aes = FALSE, force=5, alpha=0.5) +
+                    size=2, inherit.aes = FALSE, force=5, alpha=0.5,segment.size = 0) +
    theme(
       panel.background = element_rect(fill="lightsteelblue2"),
       panel.grid.minor = element_line(colour="grey90", size=0.5), 
