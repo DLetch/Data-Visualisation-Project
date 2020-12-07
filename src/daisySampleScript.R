@@ -346,6 +346,7 @@ e[e$Contributor == "MRC Harwell","lat2"] <- e[e$Contributor == "MRC Harwell","la
 e[e$Contributor == "UoL","lon2"] <- e[e$Contributor == "UoL","lon2"] - offset
 e[e$Contributor == "UoL","lat2"] <- e[e$Contributor == "UoL","lat2"] - offset
 
+
 # scatterpie vignette 
 # https://cran.r-project.org/web/packages/scatterpie/vignettes/scatterpie.html
 ggplot(data=world, aes(x=long, y=lat, group=group)) + 
