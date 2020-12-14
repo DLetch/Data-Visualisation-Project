@@ -18,7 +18,7 @@ library(ggmap)       # For maps
 library(stringr)     # To split lat/long
 library(scatterpie)  # For piecharts
 library(ggrepel)     # For non-overlapping labels
-library(ggfittext)
+library(ggfittext)   # Resize labels for alluvial charts
 
 # Read the data -----------------------------------------------------------
 
@@ -206,24 +206,25 @@ d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)              
       scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
       coord_flip() + ylab("Total Effort")
 
-# Shorten names of Partner/Contributors -try ggfixtext
-d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)                     %>%
+# Shorten names of Partner/Contributors -using ggfixtext, cf
+# https://cran.r-project.org/web/packages/ggalluvial/vignettes/labels.html
+# https://cran.r-project.org/web/packages/ggfittext/vignettes/introduction-to-ggfittext.html
+d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)                  %>%
    mutate(Partner=replace(Partner,Partner=="Alan Turing Institute","ATI"))          %>% # Shorten names
    mutate(Partner=replace(Partner,Partner=="University of Cambridge","UoC"))        %>% 
    mutate(Partner=replace(Partner,Partner=="University of Exeter","UoE"))           %>% 
    mutate(Partner=replace(Partner,Partner=="University of Leeds","UoL"))            %>% 
-   mutate(Task=gsub("/","/\n",Task))                                                %>% # Add a new line after a "/"
-   mutate(Task=gsub("&","&\n",Task))                                                %>%   
    group_by(Partner, Task, Project, MonthEffort)                                    %>% 
    summarise(TotEffort=sum(MonthEffort), .groups="keep")                            %>% 
    ggplot(aes(axis1=Partner, axis2=Task, axis3=Project,y=TotEffort)) +
    geom_alluvium(aes(fill=Partner), width = 0, reverse = FALSE) +
    guides(fill = FALSE) +
-   geom_stratum(width = 1/5, reverse = FALSE) +
-   geom_fit_text(aes(label = after_stat(stratum)),
-                 stat = "stratum", width = 1/4, min.size = 2) + 
+   geom_stratum(width = 1/4, reverse = FALSE) +
+   ggfittext::geom_fit_text(aes(label = after_stat(stratum)), 
+                 stat = "stratum", outside = TRUE,reflow=TRUE, grow=TRUE, reverse = FALSE, 
+                 min.size=2, width = 1/4) + 
    scale_x_continuous(breaks = 1:3, labels = c("Partner", "Task", "Project")) +
-   coord_flip() + ylab("Total Effort")
+   ylab("Total Effort")
 
 # Using facets
 d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)                  %>%
