@@ -126,7 +126,7 @@ for(i in 1:nrow(data)){
 # Convert the month columns to become row values in a Month column and the 
 # corresponding effort values in a MonthEffort column. This facilitates
 # the plotting when using ggplot.
-d <- pivot_longer(data,cols=Months,names_to="ProjectMonth",values_to="MonthEffort",
+d <- pivot_longer(data,cols=all_of(Months),names_to="ProjectMonth",values_to="MonthEffort",
                   names_repair = "unique")
 
 # Partner effort ----------------------------------------------------------
