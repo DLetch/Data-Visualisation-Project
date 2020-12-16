@@ -1,3 +1,4 @@
+# These packages need to be loaded (or installed if not present).
 
 library(readxl)     
 # To read the spreadsheet with synthetic data
@@ -252,19 +253,6 @@ d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)              
 # OSM not supported, see https://github.com/dkahle/ggmap/issues/117
 
 library("ggmap")
-
-# Get a GB bounding box, from:
-# https://gist.github.com/graydon/11198540
-gb <- c(-7.57216793459, 49.959999905, 1.68153079591, 58.6350001085)
-gb <- c(-7.58, 49.97, 1.68, 58.64)
-
-# See help for get_stamenmap to see the different type of maptype supported.
-# watercolor has no labels but looks a bit amateurish.
-# toner-background has no labels but is a bit heavy.
-ukmap <- get_stamenmap(gb, zoom = 5, maptype = "watercolor") 
-
-# Take a peek at the map.
-ukmap %>% ggmap() 
 
 # Split lat/long into distinct new columns
 d$lat <- as.numeric(str_split_fixed(d$Contributor_Lat_Long ,",",2)[,1])
