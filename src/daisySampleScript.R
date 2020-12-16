@@ -249,12 +249,10 @@ d %>% dplyr::select(Partner=Contributor,Task, Project,MonthEffort)              
 
 # Use of Google Maps requires you to register to use their maps API, see:
 # https://cran.r-project.org/web/packages/ggmap/readme/README.html
-#
+
 # OSM not supported, see https://github.com/dkahle/ggmap/issues/117
 
 library("ggmap")
-
-register_google(key = "[AIzaSyDVi448rEZF8gAr62b3MW1UxH7WV3Mzbjk]")
 
 # Get a GB bounding box, from:
 # https://gist.github.com/graydon/11198540
