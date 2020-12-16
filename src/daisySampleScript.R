@@ -1,4 +1,3 @@
-# These packages need to be loaded (or installed if not present).
 
 library(readxl)     
 # To read the spreadsheet with synthetic data
