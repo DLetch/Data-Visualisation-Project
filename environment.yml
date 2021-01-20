@@ -1,0 +1,9 @@
+channels:
+  - conda-forge
+  - r
+dependencies:
+  - r-base
+  - r-essentials
+  - r-ggalluvial
+  - r-ggmap
+  - r-scatterpie
