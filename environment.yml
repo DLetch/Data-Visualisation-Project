@@ -7,3 +7,5 @@ dependencies:
   - r-ggalluvial
   - r-ggmap
   - r-scatterpie
+  - r-ggrepel
+  - r-ggfittext
